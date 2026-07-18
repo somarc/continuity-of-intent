@@ -1,1 +1,19 @@
-/* add global styles that can be loaded post LCP here */
+/* Below-the-fold refinements loaded after the primary content path. */
+
+@media (hover: hover) {
+  .section.canon h2,
+  .section.continuity h2,
+  .section.constitution h2,
+  .section.method h2,
+  .section.provenance h2 {
+    transition: letter-spacing 350ms ease;
+  }
+
+  .section.canon:hover h2,
+  .section.continuity:hover h2,
+  .section.constitution:hover h2,
+  .section.method:hover h2,
+  .section.provenance:hover h2 {
+    letter-spacing: -0.045em;
+  }
+}

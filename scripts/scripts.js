@@ -143,6 +143,33 @@ function decorateButtons(main) {
 }
 
 /**
+ * Adds durable anchors and document labels to the canon's authored sections.
+ * @param {HTMLElement} main The main page container
+ */
+function decorateCanonSections(main) {
+  const anchorClasses = ['canon', 'continuity', 'constitution', 'method', 'provenance'];
+  const sections = [...main.querySelectorAll(':scope > .section')];
+
+  if (main === document.querySelector('main') && sections[0] && !sections[0].id) {
+    sections[0].id = 'top';
+  }
+
+  sections.forEach((section) => {
+    const anchor = anchorClasses.find((className) => section.classList.contains(className));
+    if (anchor && !section.id) section.id = anchor;
+
+    const firstParagraph = section.querySelector(':scope > .default-content-wrapper > p:first-child');
+    if (
+      firstParagraph
+      && firstParagraph.children.length === 1
+      && firstParagraph.firstElementChild?.tagName === 'EM'
+    ) {
+      firstParagraph.classList.add('section-kicker');
+    }
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -151,6 +178,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateCanonSections(main);
   decorateBlocks(main);
   decorateButtons(main);
 }

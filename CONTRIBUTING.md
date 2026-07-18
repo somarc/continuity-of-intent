@@ -1,73 +1,76 @@
-# Contributing to Project Helix
+# Contributing to Continuity of Intent
 
-This project (like almost all of Project Helix) is an Open Development project and welcomes contributions from everyone who finds it useful or lacking.
+Continuity of Intent is a public, amendable canon and an Adobe Experience
+Manager Edge Delivery Services site. Contributions should preserve both its
+editorial precision and its authorable, high-performance implementation.
 
-## Code Of Conduct
+## Before proposing a change
 
-This project adheres to the Adobe [code of conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to cstaub at adobe dot com.
+Read:
 
-## Contributor License Agreement
+- [CANON.md](./CANON.md) for the current intent and amendment protocol;
+- [README.md](./README.md) for the code/content boundary and local workflow;
+- [AGENTS.md](./AGENTS.md) for repository-specific EDS engineering rules;
+- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
-All third-party contributions to this project must be accompanied by a signed contributor license. This gives Adobe permission to redistribute your contributions as part of the project. [Sign our CLA](http://opensource.adobe.com/cla.html)! You only need to submit an Adobe CLA one time, so if you have submitted one previously, you are good to go!
+Material changes to the canon should state:
 
-## Things to Keep in Mind
+1. **Then** — the prior statement or interpretation.
+2. **Learned** — the evidence, constraint, or changed understanding.
+3. **Now** — the proposed revision.
+4. **Continuity preserved** — what remains invariant.
 
-This project uses a **commit then review** process, which means that for approved maintainers, changes can be merged immediately, but will be reviewed by others.
+## Development workflow
 
-For other contributors, a maintainer of the project has to approve the pull request.
+Create a feature branch and install the pinned development dependencies:
 
-# Before You Contribute
-
-* Check that there is an existing issue in GitHub issues
-* Check if there are other pull requests that might overlap or conflict with your intended contribution
-
-# How to Contribute
-
-1. Fork the repository
-2. Make some changes on a branch on your fork
-3. Create a pull request from your branch
-
-In your pull request, outline:
-
-* What the changes intend
-* How they change the existing code
-* If (and what) they breaks
-* Start the pull request with the GitHub issue ID, e.g. #123
-
-Lastly, please follow the [pull request template](.github/pull_request_template.md) when submitting a pull request!
-
-Each commit message that is not part of a pull request:
-
-* Should contain the issue ID like `#123`
-* Can contain the tag `[trivial]` for trivial changes that don't relate to an issue
-
-
-
-## Coding Styleguides
-
-We enforce a coding styleguide using `eslint`. As part of your build, run `npm run lint` to check if your code is conforming to the style guide. We do the same for every PR in our CI, so PRs will get rejected if they don't follow the style guide.
-
-You can fix some of the issues automatically by running `npx eslint . --fix`.
-
-## Commit Message Format
-
-This project uses a structured commit changelog format that should be used for every commit. Use `npm run commit` instead of your usual `git commit` to generate commit messages using a wizard.
-
-```bash
-# either add all changed files
-$ git add -A
-# or selectively add files
-$ git add package.json
-# then commit using the wizard
-$ npm run commit
+```sh
+npm ci
+npm run lint
 ```
 
-# How Contributions get Reviewed
+Use the project-pinned DA target and inspect state before any remote operation:
 
-One of the maintainers will look at the pull request within one week. Feedback on the pull request will be given in writing, in GitHub.
+```sh
+da status --format json
+da site model --format json
+da content status
+```
 
-# Release Management
+Remote writes are dry-run by default. Never add `--commit` until the target,
+paths, and preflight are understood. Preview and live publication are separate
+decisions; a contribution must not publish to `*.aem.live` as a side effect.
 
-The project's committers will release to the [Adobe organization on npmjs.org](https://www.npmjs.com/org/adobe).
-Please contact the [Adobe Open Source Advisory Board](https://git.corp.adobe.com/OpenSourceAdvisoryBoard/discuss/issues) to get access to the npmjs organization.
+## EDS expectations
 
+- Keep authored content separate from the code bus.
+- Preserve semantic heading order and accessible names.
+- Treat each block's initial table as an authoring contract.
+- Handle missing and additional authored cells without deleting content.
+- Keep the static path meaningful if JavaScript or optional motion fails.
+- Respect `prefers-reduced-motion` and visible keyboard focus.
+- Do not modify `scripts/aem.js`.
+
+## Pull requests
+
+A pull request should include:
+
+- the intent advanced or amended;
+- affected invariants and authoring contracts;
+- evidence from lint, section-shape checks, and local/feature preview;
+- a feature-preview URL for the changed page;
+- known limits or debt that remain open.
+
+Useful checks:
+
+```sh
+npm run lint
+git diff --check
+da content fix-sections .da/workspace/*.html --format json
+da pipeline quality-gate .da/workspace/index.html --format json
+```
+
+## License
+
+By contributing, you agree that your contribution may be distributed under
+this repository's [Apache License 2.0](./LICENSE).

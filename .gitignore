@@ -8,6 +8,9 @@ helix-importer-ui
 *.bak
 .idea
 
+# DA CLI local content, jobs, and working state
+.da/
+
 # Ensure these files are tracked
 !CLAUDE.md
 !AGENTS.md
