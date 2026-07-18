@@ -26,7 +26,7 @@ function sha256(file) {
   return createHash('sha256').update(readFileSync(file)).digest('hex');
 }
 
-function sessionEvidence(receiptFile, toolName, extensions) {
+function sessionEvidence(receiptFile, toolName, extensions, managedFolders) {
   if (!existsSync(receiptFile) || statSync(receiptFile).size === 0) {
     throw new Error(`Missing Grok receipt: ${receiptFile}`);
   }
@@ -44,15 +44,21 @@ function sessionEvidence(receiptFile, toolName, extensions) {
 
   const escapedSession = sessionDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const extensionPattern = extensions.map((extension) => extension.replace('.', '\\.')).join('|');
-  const outputPattern = new RegExp(`${escapedSession}/images/[^"\\\\]+(?:${extensionPattern})`, 'gi');
+  const folderPattern = managedFolders.join('|');
+  const outputPattern = new RegExp(
+    `${escapedSession}/(?:${folderPattern})/[^"\\\\]+(?:${extensionPattern})`, 'gi',
+  );
   const candidates = [...new Set(transcript.match(outputPattern) || [])]
     .filter((candidate) => existsSync(candidate));
   if (!candidates.length) throw new Error(`No managed ${toolName} output found in ${updatesFile}`);
 
-  const imagesRoot = realpathSync(join(sessionDir, 'images'));
   const source = realpathSync(candidates[candidates.length - 1]);
-  if (!source.startsWith(`${imagesRoot}${sep}`)) {
-    throw new Error(`Refusing output outside Grok session images directory: ${source}`);
+  const managedRoots = managedFolders
+    .map((folder) => join(sessionDir, folder))
+    .filter((folder) => existsSync(folder))
+    .map((folder) => realpathSync(folder));
+  if (!managedRoots.some((root) => source.startsWith(`${root}${sep}`))) {
+    throw new Error(`Refusing output outside Grok session managed media directories: ${source}`);
   }
   return { receipt, sessionDir, updatesFile, source, toolName };
 }
@@ -112,9 +118,10 @@ function main() {
   const extensions = kind === 'poster'
     ? ['.jpg', '.jpeg', '.png', '.webp']
     : ['.mp4', '.mov', '.webm'];
+  const managedFolders = kind === 'poster' ? ['images'] : ['videos', 'images'];
   let evidence;
   try {
-    evidence = sessionEvidence(resolve(receiptArg), toolName, extensions);
+    evidence = sessionEvidence(resolve(receiptArg), toolName, extensions, managedFolders);
   } catch (error) {
     if (optional) {
       console.log(`Optional ${kind} not collected: ${error.message}`);
