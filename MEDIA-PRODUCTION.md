@@ -80,6 +80,22 @@ node tools/validate-media.cjs --plan
 The validator checks dimensions, 16:9 crop, file bounds, video duration,
 codec/stream properties, and hashes. Human visual review remains mandatory.
 
+If an Imagine tool call succeeded but collection or validation was improved
+after the run, recover the managed outputs without generating again:
+
+```sh
+da --riverboat-gambler \
+  --org somarc --repo continuity-of-intent --branch canon \
+  --format json pipeline run pipelines/grok-imagine-collect.yaml --dry-run
+
+da --riverboat-gambler \
+  --org somarc --repo continuity-of-intent --branch canon \
+  --format json pipeline run pipelines/grok-imagine-collect.yaml --approve-all
+```
+
+The recovery YAML is also tracked, approval-gated, local-only, and performs no
+DA write.
+
 ### 4. Preflight DA media ownership
 
 Run the commands printed by `--plan` without `--commit` first. The canonical

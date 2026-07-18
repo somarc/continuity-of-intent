@@ -89,21 +89,49 @@ function collectVideo(evidence) {
   ]));
   const stream = probe.streams.find((candidate) => candidate.codec_type === 'video');
   if (!stream) throw new Error('Imagine video output has no video stream');
+  const width = Number(stream.width);
+  const height = Number(stream.height);
+  const ratio = width / height;
+  const sourceMedia = {
+    width,
+    height,
+    aspectRatio: ratio,
+    codec: stream.codec_name,
+    pixelFormat: stream.pix_fmt,
+  };
 
-  if (stream.codec_name === 'h264' && stream.pix_fmt === 'yuv420p') {
+  if (
+    stream.codec_name === 'h264'
+    && stream.pix_fmt === 'yuv420p'
+    && width >= 1280
+    && height >= 720
+    && ratio >= 1.76
+    && ratio <= 1.79
+  ) {
     run('ffmpeg', [
       '-y', '-i', rawTarget, '-map', '0:v:0', '-an', '-c:v', 'copy',
       '-movflags', '+faststart', target,
     ]);
-    return { rawTarget, target, normalizedWith: 'FFmpeg stream copy, audio removed, fast-start' };
+    return {
+      rawTarget,
+      target,
+      sourceMedia,
+      normalizedWith: 'FFmpeg stream copy, audio/attachments removed, fast-start',
+    };
   }
 
   run('ffmpeg', [
     '-y', '-i', rawTarget, '-map', '0:v:0', '-an', '-c:v', 'libx264',
+    '-vf', 'scale=1280:720:force_original_aspect_ratio=increase:flags=lanczos,crop=1280:720',
     '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', '20',
     '-movflags', '+faststart', target,
   ]);
-  return { rawTarget, target, normalizedWith: 'FFmpeg H.264 yuv420p CRF20, audio removed, fast-start' };
+  return {
+    rawTarget,
+    target,
+    sourceMedia,
+    normalizedWith: `FFmpeg H.264 yuv420p CRF20, Lanczos scale/crop from ${width}x${height} to 1280x720, audio/attachments removed, fast-start`,
+  };
 }
 
 function main() {
@@ -140,6 +168,7 @@ function main() {
     rawCopy: collected.rawTarget.replace(`${process.cwd()}/`, ''),
     output: collected.target.replace(`${process.cwd()}/`, ''),
     outputSha256: sha256(collected.target),
+    sourceMedia: collected.sourceMedia,
     normalizedWith: collected.normalizedWith,
   };
   writeFileSync(resolve(STAGE, `collector-${kind}.json`), `${JSON.stringify(result, null, 2)}\n`, {
