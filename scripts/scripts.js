@@ -170,6 +170,22 @@ function decorateCanonSections(main) {
 }
 
 /**
+ * Removes metadata tables after the delivery pipeline has lifted their values
+ * into the document head. DA markup can retain the source table in the body.
+ * @param {HTMLElement} main The main page container
+ */
+function removeLiftedMetadata(main) {
+  main.querySelectorAll('.metadata').forEach((metadata) => {
+    const wrapper = metadata.parentElement;
+    const section = metadata.closest('.section');
+    metadata.remove();
+
+    if (wrapper && !wrapper.children.length && !wrapper.textContent.trim()) wrapper.remove();
+    if (section && !section.children.length && !section.textContent.trim()) section.remove();
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -178,6 +194,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  removeLiftedMetadata(main);
   decorateCanonSections(main);
   decorateBlocks(main);
   decorateButtons(main);
