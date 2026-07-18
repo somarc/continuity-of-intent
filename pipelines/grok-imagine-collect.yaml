@@ -1,0 +1,36 @@
+# TRUST BOUNDARY: recover and validate already-generated Grok session media.
+# Review with --dry-run and invoke only with hidden --riverboat-gambler.
+# This pipeline performs no Grok generation and no DA write.
+name: continuity-grok-imagine-collect
+context:
+  org: somarc
+  repo: continuity-of-intent
+  branch: canon
+steps:
+  - id: orientation
+    command: status --format json
+
+  - id: toolchain
+    command: 'command -v node && command -v magick && command -v ffmpeg && command -v ffprobe'
+    depends_on: [orientation]
+    requires_approval: true
+    timeout: 30s
+
+  - id: collect-poster
+    command: 'node tools/collect-grok-media.cjs poster .da/media-staging/grok-poster-run.json'
+    depends_on: [toolchain]
+    requires_approval: true
+    timeout: 2m
+
+  - id: collect-video
+    command: 'node tools/collect-grok-media.cjs video .da/media-staging/grok-video-run.json --optional'
+    depends_on: [collect-poster]
+    requires_approval: true
+    timeout: 5m
+    continue_on_error: true
+
+  - id: validate-and-plan
+    command: 'node tools/validate-media.cjs --plan'
+    depends_on: [collect-video]
+    requires_approval: true
+    timeout: 2m

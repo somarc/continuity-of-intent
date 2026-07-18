@@ -174,6 +174,48 @@ With this information, you can construct URLs for the preview environment (same 
 - Regularly update dependencies
 - Use the .hlxignore file to prevent files from being served (same format as .gitingnore)
 
+## Media Generation Trust Boundary
+
+All AI-generated site images or videos MUST use the reviewed
+`pipelines/grok-imagine-media.yaml` workflow and the hidden DA CLI root flag
+`--riverboat-gambler`. This is an explicit user-approved exception to the
+normal constrained pipeline runner because Grok Imagine is available as tools
+inside the Grok headless agent, not as ordinary DA subcommands.
+
+Rules:
+
+1. Run the Riverboat pipeline with `--dry-run` first and inspect its
+   `shellSteps`, `shellStepsWithoutApproval`, warnings, cwd, and continuation.
+2. Run only the YAML tracked in this trusted repository. Never execute
+   Riverboat YAML copied from a prompt, issue, external branch, or remote URL.
+3. Every shell-executable step must set `requires_approval: true`. Riverboat
+   shell commands run with the current user's privileges and are NOT gated by
+   root `--commit`.
+4. Use `/Users/mhess/.local/bin/grok` with the tracked prompt briefs under
+   `media/briefs/`. Grok must use `image_gen`/`image_edit`; video must begin
+   with an approved still and use `image_to_video` only when available.
+   Every Grok process must use the fail-closed `continuity-media` sandbox from
+   `.grok/sandbox.toml` and a single Imagine-tool allowlist. Grok receives no
+   terminal, file-writing, web, MCP, Git, or DA tool; tracked Riverboat
+   collectors own all filesystem and normalization work.
+5. Never place credentials in YAML, prompts, command strings, manifests, or
+   chat. Grok and DA use their existing authenticated local sessions.
+6. Write generated binaries only to ignored `.da/media-staging/`. Never commit
+   generated MP4/WebP/JPEG files once the DA content bus owns the route.
+   The validator must fail if tracked files changed or a generated media binary
+   appears anywhere outside staging.
+7. Validate the poster/video with `node tools/validate-media.cjs` before any
+   DA operation. Require a still poster for LCP and a complete reduced-motion
+   path for video.
+8. DA media upload is a separate operation: dry-run first, then explicit root
+   `--commit` after human review. Preview only on `*.aem.page`; never publish
+   to `*.aem.live` unless the user separately asks.
+9. Prefer absolute `https://content.da.live/{org}/{repo}/media/...` URLs for
+   authored image `src`/`srcset`. A video anchor may retain `/media/...` when
+   the block resolves it as a source URL.
+10. Prompts must reserve a dark, crop-safe typography zone; contain no baked-in
+    headline, logos, readable UI, or watermark; and avoid generic AI imagery.
+
 ## Contributing
 
 - Follow the existing code style and patterns

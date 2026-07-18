@@ -1,0 +1,368 @@
+.canon-hero-container .canon-hero-wrapper {
+  max-width: unset;
+  padding: 0;
+}
+
+.canon-hero {
+  position: relative;
+  display: grid;
+  align-items: end;
+  min-height: calc(100svh - var(--nav-height));
+  padding: 84px var(--page-gutter) 42px;
+  background: var(--ink);
+  color: var(--paper-bright);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.canon-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line-dark) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.18;
+  mask-image: linear-gradient(to bottom, transparent, black 28%, black 78%, transparent);
+}
+
+.canon-hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: auto 0 0;
+  height: 46%;
+  background: linear-gradient(to bottom, transparent, var(--ink) 76%);
+  pointer-events: none;
+}
+
+.canon-hero .canon-hero-media,
+.canon-hero .canon-hero-poster,
+.canon-hero .canon-hero-poster picture,
+.canon-hero .canon-hero-poster img,
+.canon-hero .canon-hero-media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.canon-hero .canon-hero-media {
+  z-index: -4;
+  background: var(--ink);
+  overflow: hidden;
+}
+
+.canon-hero .canon-hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--ink) 0%, color-mix(in srgb, var(--ink) 82%, transparent) 42%, transparent 78%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 28%, transparent), var(--ink) 96%);
+}
+
+.canon-hero .canon-hero-poster picture {
+  display: block;
+}
+
+.canon-hero .canon-hero-poster img,
+.canon-hero .canon-hero-media video {
+  object-fit: cover;
+}
+
+.canon-hero .canon-hero-poster img {
+  opacity: 0.62;
+}
+
+.canon-hero .canon-hero-media video {
+  opacity: 0.54;
+}
+
+.canon-hero.video-error .canon-hero-media video {
+  display: none;
+}
+
+.canon-hero.has-media::before {
+  opacity: 0.1;
+}
+
+.canon-hero-signal {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.76;
+  pointer-events: none;
+}
+
+.canon-hero.has-media .canon-hero-signal {
+  opacity: 0.55;
+}
+
+.canon-hero-signal svg {
+  width: 100%;
+  height: 100%;
+}
+
+.canon-hero-signal path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.canon-hero-signal-ghost {
+  stroke: var(--line-dark);
+  stroke-width: 1.5;
+}
+
+.canon-hero-signal-thread {
+  stroke: var(--signal);
+  stroke-width: 2.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.canon-hero.is-ready .canon-hero-signal-thread {
+  animation: canon-thread-draw 2600ms cubic-bezier(0.2, 0.7, 0.2, 1) 180ms forwards;
+}
+
+.canon-hero-signal-echo {
+  stroke: var(--paper);
+  stroke-width: 1;
+  opacity: 0.16;
+}
+
+.canon-hero-signal-node {
+  fill: var(--signal);
+  opacity: 0;
+}
+
+.canon-hero.is-ready .canon-hero-signal-node {
+  animation: canon-node-arrive 600ms ease forwards;
+}
+
+.canon-hero.is-ready .canon-hero-signal-node.node-1 {
+  animation-delay: 900ms;
+}
+
+.canon-hero.is-ready .canon-hero-signal-node.node-2 {
+  animation-delay: 1650ms;
+}
+
+.canon-hero.is-ready .canon-hero-signal-node.node-3 {
+  animation-delay: 2250ms;
+}
+
+.canon-hero-content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--content-max));
+  margin: 0 auto;
+}
+
+.canon-hero-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+  color: var(--signal);
+  font-family: var(--mono-font-family);
+  font-size: 0.67rem;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.canon-hero-label::before {
+  content: "";
+  width: 38px;
+  border-top: 1px solid currentcolor;
+}
+
+.canon-hero-title {
+  max-width: 1220px;
+  margin: 0;
+  font-size: clamp(3.85rem, 13.4vw, 11.8rem);
+  letter-spacing: -0.055em;
+  line-height: 0.8;
+  text-wrap: balance;
+}
+
+.canon-hero-deck {
+  max-width: 660px;
+  margin-top: 48px;
+  margin-left: auto;
+  color: var(--line);
+  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  line-height: 1.42;
+}
+
+.canon-hero-deck p:last-child {
+  margin-bottom: 0;
+}
+
+.canon-hero-extras {
+  max-width: 660px;
+  margin-top: 24px;
+  margin-left: auto;
+  color: var(--line);
+  font-size: var(--body-font-size-s);
+}
+
+.canon-hero-extras > :last-child {
+  margin-bottom: 0;
+}
+
+.canon-hero-actions {
+  margin-top: 28px;
+  margin-left: auto;
+  max-width: 660px;
+}
+
+.canon-hero-actions a.button.primary {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--ink);
+}
+
+.canon-hero-actions a.button.secondary {
+  border-color: var(--line);
+  color: var(--paper);
+}
+
+.canon-hero-edition {
+  margin: 36px 0 0;
+  color: var(--line);
+  font-family: var(--mono-font-family);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.canon-hero-continuation:any-link {
+  position: absolute;
+  right: var(--page-gutter);
+  bottom: 42px;
+  display: none;
+  color: var(--line);
+  font-family: var(--mono-font-family);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.canon-hero-continuation::after {
+  content: "↓";
+  margin-top: 14px;
+  color: var(--signal);
+  font-size: 1rem;
+}
+
+@keyframes canon-thread-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes canon-node-arrive {
+  from {
+    opacity: 0;
+    r: 2px;
+  }
+
+  to {
+    opacity: 1;
+    r: 7px;
+  }
+}
+
+@media (width >= 600px) {
+  .canon-hero {
+    padding-top: 100px;
+    padding-bottom: 54px;
+  }
+
+  .canon-hero-title {
+    font-size: clamp(5.8rem, 11vw, 9rem);
+    letter-spacing: -0.065em;
+    line-height: 0.76;
+  }
+}
+
+@media (height < 760px) and (width < 600px) {
+  .canon-hero {
+    padding-top: 40px;
+    padding-bottom: 20px;
+  }
+
+  .canon-hero-label {
+    margin-bottom: 15px;
+  }
+
+  .canon-hero-title {
+    font-size: clamp(3.35rem, 13vw, 3.85rem);
+    line-height: 0.82;
+  }
+
+  .canon-hero-deck {
+    margin-top: 22px;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .canon-hero-actions {
+    margin-top: 12px;
+  }
+
+  .canon-hero-actions p.button-wrapper {
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .canon-hero-edition {
+    display: none;
+  }
+}
+
+@media (width >= 900px) {
+  .canon-hero {
+    padding-top: 126px;
+    padding-bottom: 68px;
+  }
+
+  .canon-hero-label {
+    margin-bottom: 42px;
+  }
+
+  .canon-hero-deck {
+    margin-top: 58px;
+    margin-right: 10%;
+  }
+
+  .canon-hero-actions,
+  .canon-hero-edition,
+  .canon-hero-extras {
+    margin-right: 10%;
+  }
+
+  .canon-hero-continuation:any-link {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canon-hero .canon-hero-media video {
+    display: none;
+  }
+
+  .canon-hero-signal-thread {
+    stroke-dashoffset: 0;
+  }
+
+  .canon-hero-signal-node {
+    opacity: 1;
+  }
+}

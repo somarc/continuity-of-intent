@@ -143,6 +143,49 @@ function decorateButtons(main) {
 }
 
 /**
+ * Adds durable anchors and document labels to the canon's authored sections.
+ * @param {HTMLElement} main The main page container
+ */
+function decorateCanonSections(main) {
+  const anchorClasses = ['canon', 'continuity', 'constitution', 'method', 'provenance'];
+  const sections = [...main.querySelectorAll(':scope > .section')];
+
+  if (main === document.querySelector('main') && sections[0] && !sections[0].id) {
+    sections[0].id = 'top';
+  }
+
+  sections.forEach((section) => {
+    const anchor = anchorClasses.find((className) => section.classList.contains(className));
+    if (anchor && !section.id) section.id = anchor;
+
+    const firstParagraph = section.querySelector(':scope > .default-content-wrapper > p:first-child');
+    if (
+      firstParagraph
+      && firstParagraph.children.length === 1
+      && firstParagraph.firstElementChild?.tagName === 'EM'
+    ) {
+      firstParagraph.classList.add('section-kicker');
+    }
+  });
+}
+
+/**
+ * Removes metadata tables after the delivery pipeline has lifted their values
+ * into the document head. DA markup can retain the source table in the body.
+ * @param {HTMLElement} main The main page container
+ */
+function removeLiftedMetadata(main) {
+  main.querySelectorAll('.metadata').forEach((metadata) => {
+    const wrapper = metadata.parentElement;
+    const section = metadata.closest('.section');
+    metadata.remove();
+
+    if (wrapper && !wrapper.children.length && !wrapper.textContent.trim()) wrapper.remove();
+    if (section && !section.children.length && !section.textContent.trim()) section.remove();
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -151,6 +194,8 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  removeLiftedMetadata(main);
+  decorateCanonSections(main);
   decorateBlocks(main);
   decorateButtons(main);
 }

@@ -1,0 +1,80 @@
+.claim-ledger {
+  margin-top: 78px;
+}
+
+.claim-ledger .claim-ledger-list {
+  margin: 0;
+}
+
+.claim-ledger .claim-ledger-entry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  border-top: 1px solid var(--ink);
+  padding: 28px 0 36px;
+}
+
+.claim-ledger .claim-ledger-entry dt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono-font-family);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.claim-ledger .claim-ledger-entry dt::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+}
+
+.claim-ledger .claim-ledger-entry[data-claim="demonstrated"] dt {
+  color: var(--verified);
+}
+
+.claim-ledger .claim-ledger-entry[data-claim="open"] dt {
+  color: var(--oxide);
+}
+
+.claim-ledger .claim-ledger-entry[data-claim="intent"] dt::before,
+.claim-ledger .claim-ledger-entry[data-claim="intended"] dt::before {
+  background: var(--ink);
+}
+
+.claim-ledger .claim-ledger-entry[data-claim="demonstrated"] dt::before {
+  background: var(--verified);
+}
+
+.claim-ledger .claim-ledger-entry[data-claim="open"] dt::before {
+  background: var(--oxide);
+}
+
+.claim-ledger .claim-ledger-entry dd {
+  max-width: 760px;
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: clamp(1.65rem, 3.4vw, 3.2rem);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.claim-ledger .claim-ledger-entry dd p:last-child {
+  margin-bottom: 0;
+}
+
+@media (width >= 900px) {
+  .claim-ledger {
+    margin-top: 112px;
+  }
+
+  .claim-ledger .claim-ledger-entry {
+    grid-template-columns: minmax(180px, 0.7fr) 2.3fr;
+    gap: 48px;
+    padding: 38px 0 46px;
+  }
+}
