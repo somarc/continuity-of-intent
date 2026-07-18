@@ -1,4 +1,68 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const VIDEO_PATTERN = /\.(mp4|webm|ogg)(?:[?#].*)?$/i;
+
+function removeMediaLink(link) {
+  const paragraph = link.closest('p');
+  if (
+    paragraph
+    && paragraph.querySelectorAll('a').length === 1
+    && paragraph.textContent.trim() === link.textContent.trim()
+  ) {
+    paragraph.remove();
+  } else {
+    link.remove();
+  }
+}
+
+function extractMedia(block) {
+  const videoLink = [...block.querySelectorAll('a[href]')]
+    .find((link) => VIDEO_PATTERN.test(link.href));
+  const picture = block.querySelector('picture');
+  const standaloneImage = picture ? null : block.querySelector('img');
+  if (!videoLink && !picture && !standaloneImage) return null;
+
+  const media = document.createElement('div');
+  media.className = 'canon-hero-media';
+  media.setAttribute('aria-hidden', 'true');
+
+  const posterImage = picture?.querySelector('img') || standaloneImage;
+  if (picture || standaloneImage) {
+    const poster = document.createElement('div');
+    poster.className = 'canon-hero-poster';
+    if (posterImage) {
+      posterImage.alt = '';
+      posterImage.loading = 'eager';
+      posterImage.setAttribute('fetchpriority', 'high');
+    }
+    poster.append(picture || standaloneImage);
+    media.append(poster);
+    block.classList.add('has-poster');
+  }
+
+  if (videoLink) {
+    const video = document.createElement('video');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = Boolean(navigator.connection?.saveData);
+    video.src = videoLink.href;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = 'none';
+    video.tabIndex = -1;
+    video.setAttribute('aria-hidden', 'true');
+    if (posterImage?.currentSrc || posterImage?.src) {
+      video.poster = posterImage.currentSrc || posterImage.src;
+    }
+    if (!reducedMotion && !saveData) video.autoplay = true;
+    video.addEventListener('error', () => block.classList.add('video-error'));
+    media.append(video);
+    removeMediaLink(videoLink);
+    block.classList.add('has-video');
+  }
+
+  block.classList.add('has-media');
+  return media;
+}
 
 function createSignalField() {
   const field = document.createElement('div');
@@ -70,7 +134,10 @@ function getTitle(row) {
  * @param {HTMLElement} block authored canon hero block
  */
 export default function decorate(block) {
-  const rows = [...block.children];
+  const media = extractMedia(block);
+  const rows = [...block.children].filter((row) => (
+    row.textContent.trim() || row.querySelector('img, picture, video')
+  ));
   const content = document.createElement('div');
   content.className = 'canon-hero-content';
 
@@ -109,6 +176,6 @@ export default function decorate(block) {
   continuation.href = '#canon';
   continuation.textContent = 'Continue the argument';
 
-  block.replaceChildren(createSignalField(), content, continuation);
+  block.replaceChildren(...(media ? [media] : []), createSignalField(), content, continuation);
   window.requestAnimationFrame(() => block.classList.add('is-ready'));
 }

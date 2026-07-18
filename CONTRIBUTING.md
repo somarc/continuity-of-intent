@@ -51,6 +51,19 @@ decisions; a contribution must not publish to `*.aem.live` as a side effect.
 - Respect `prefers-reduced-motion` and visible keyboard focus.
 - Do not modify `scripts/aem.js`.
 
+### Generated media
+
+Do not call Grok, Imagine, or another media generator ad hoc. Use the reviewed
+`pipelines/grok-imagine-media.yaml` pipeline with the hidden root
+`--riverboat-gambler` flag and inspect its dry-run plan first. Riverboat runs
+arbitrary local shell commands and is not protected by root `--commit`; only
+trusted repository YAML may cross that boundary.
+
+Generated images and videos belong in `.da/media-staging/`, not Git. Preserve
+the prompt brief and generated manifest, validate poster/video properties, and
+perform DA media upload as a separate dry-run and approved mutation. Never
+publish generated media to `*.aem.live` from the creation pipeline.
+
 ## Pull requests
 
 A pull request should include:

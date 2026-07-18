@@ -33,7 +33,7 @@ The homepage intentionally uses a small semantic block vocabulary:
 
 | Block | Authored rows |
 |---|---|
-| `canon-hero` | label; page `h1`; deck; actions. Additional cells and rows are preserved as supporting content. |
+| `canon-hero` | optional poster/video rows; label; page `h1`; deck; actions. Media order is flexible, and additional content is preserved. |
 | `canon-articles` | article number + heading/body. A one-cell row receives an automatic number. |
 | `continuity-record` | stage label + heading/body. A one-cell row uses the neutral `Stage` label. |
 | `claim-ledger` | controlled claim label + definition. A one-cell row uses the neutral `Claim` label. |
@@ -58,6 +58,24 @@ npx -y @adobe/aem-cli up --no-open --forward-browser-logs
 
 Static content-driven-development fixtures live under `drafts/` and are
 excluded from the delivery code bus.
+
+## Grok Imagine media production
+
+AI-generated content media is produced only through the reviewed Riverboat
+pipeline documented in [MEDIA-PRODUCTION.md](./MEDIA-PRODUCTION.md):
+
+```sh
+da --riverboat-gambler \
+  --org somarc --repo continuity-of-intent --branch canon \
+  --format json pipeline run pipelines/grok-imagine-media.yaml --dry-run
+```
+
+The hidden flag is intentional: Riverboat allows trusted local YAML to invoke
+the Grok headless CLI, whose Imagine tools create the poster and, when
+available, an image-driven video. Generated binaries remain under ignored
+`.da/media-staging/`; only reviewed prompts, validation code, and provenance
+contracts belong in Git. Generation never implies DA upload, page preview, or
+live publication.
 
 ## DA workflow
 
@@ -101,6 +119,7 @@ default development loop.
 - one page-level `h1` and a coherent heading hierarchy;
 - visible keyboard focus and WCAG-minded contrast;
 - restrained motion with a complete `prefers-reduced-motion` path;
+- Grok Imagine media created through the reviewed Riverboat trust boundary;
 - no modification of `scripts/aem.js`;
 - lint clean before review.
 

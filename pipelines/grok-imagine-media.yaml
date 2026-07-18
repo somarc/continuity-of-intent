@@ -1,0 +1,62 @@
+# TRUST BOUNDARY: this tracked YAML executes local shell commands.
+# It MUST be invoked with the hidden root --riverboat-gambler flag, reviewed
+# with --dry-run first, and run only in this trusted checkout.
+# Root --commit does not gate shell steps. This pipeline performs no DA write.
+name: continuity-grok-imagine-media
+context:
+  org: somarc
+  repo: continuity-of-intent
+  branch: canon
+steps:
+  - id: orientation
+    command: status --format json
+
+  - id: toolchain
+    command: 'test -x /Users/mhess/.local/bin/grok && /Users/mhess/.local/bin/grok --version && command -v magick && command -v ffmpeg && command -v ffprobe'
+    depends_on: [orientation]
+    requires_approval: true
+    timeout: 30s
+
+  - id: prepare-staging
+    command: 'mkdir -p .da/media-staging/raw && rm -f .da/media-staging/continuity-hero-poster.webp .da/media-staging/continuity-hero-loop.mp4 .da/media-staging/manifest.json .da/media-staging/grok-poster-run.json .da/media-staging/grok-video-run.json .da/media-staging/collector-poster.json .da/media-staging/collector-video.json'
+    depends_on: [toolchain]
+    requires_approval: true
+    timeout: 30s
+
+  - id: grok-imagine-poster
+    command: '/Users/mhess/.local/bin/grok --cwd "$PWD" --sandbox continuity-media --prompt-file media/briefs/continuity-hero-poster.md --output-format json --permission-mode bypassPermissions --tools "image_gen" --disallowed-tools "Agent,web_search,web_fetch,run_terminal_cmd,read_file,search_replace" --deny "MCPTool(*)" --no-subagents --max-turns 6 --no-auto-update > .da/media-staging/grok-poster-run.json'
+    depends_on: [prepare-staging]
+    requires_approval: true
+    timeout: 20m
+
+  - id: collect-poster
+    command: 'node tools/collect-grok-media.cjs poster .da/media-staging/grok-poster-run.json'
+    depends_on: [grok-imagine-poster]
+    requires_approval: true
+    timeout: 2m
+
+  - id: validate-poster
+    command: 'node tools/validate-media.cjs --poster-only'
+    depends_on: [collect-poster]
+    requires_approval: true
+    timeout: 1m
+
+  - id: grok-imagine-video
+    command: '/Users/mhess/.local/bin/grok --cwd "$PWD" --sandbox continuity-media --prompt-file media/briefs/continuity-hero-video.md --output-format json --permission-mode bypassPermissions --tools "image_to_video" --disallowed-tools "Agent,web_search,web_fetch,run_terminal_cmd,read_file,search_replace" --deny "MCPTool(*)" --no-subagents --max-turns 6 --no-auto-update > .da/media-staging/grok-video-run.json'
+    depends_on: [validate-poster]
+    requires_approval: true
+    timeout: 30m
+    continue_on_error: true
+
+  - id: collect-video
+    command: 'node tools/collect-grok-media.cjs video .da/media-staging/grok-video-run.json --optional'
+    depends_on: [grok-imagine-video]
+    requires_approval: true
+    timeout: 3m
+    continue_on_error: true
+
+  - id: validate-and-plan
+    command: 'node tools/validate-media.cjs --plan'
+    depends_on: [collect-video]
+    requires_approval: true
+    timeout: 1m

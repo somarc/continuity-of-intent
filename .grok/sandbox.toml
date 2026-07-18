@@ -1,0 +1,15 @@
+[profiles.continuity-media]
+extends = "strict"
+restrict_network = true
+read_only = ["/Users/mhess/continuity-of-intent"]
+read_write = ["/Users/mhess/continuity-of-intent/.da/media-staging"]
+deny = [
+  "/Users/mhess/continuity-of-intent/.git",
+  "/Users/mhess/continuity-of-intent/.da.json",
+  "/Users/mhess/.aem",
+  "/Users/mhess/.ssh",
+  "/Users/mhess/.config/gh",
+  "**/.env",
+  "**/*.pem",
+  "**/*.key",
+]

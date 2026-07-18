@@ -11,6 +11,14 @@ helix-importer-ui
 # DA CLI local content, jobs, and working state
 .da/
 
+# Generated content media is DA-owned. Force-add only with explicit review.
+*.mp4
+*.webm
+*.webp
+*.jpg
+*.jpeg
+*.png
+
 # Ensure these files are tracked
 !CLAUDE.md
 !AGENTS.md
